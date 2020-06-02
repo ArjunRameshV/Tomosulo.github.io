@@ -11,7 +11,11 @@ $(document).ready(function() {
     const load_rs_number = 4
     const store_rs_number = 4
     const bin_rs_number = 4
-    const fps = 0.0005;
+    const add_mod_number = 4
+    const mult_mod_number = 3
+    const bin_mod_number = 5
+    const load_mod_number = 3
+    const fps = 2;
     const add_t = 3;
     const mult_t = 10;
     const load_t = 2;
@@ -299,14 +303,16 @@ $(document).ready(function() {
 
 
     ////////////////// Certain useful functions ////////////
-    function check_full(mod_adder) {
-        if (mod_adder.length === add_rs_number + 1)
-            return -1;
-        return mod_adder.length;
+    function check_full(mod, limit) {
+        for (let i = 0; i < limit; i++) {
+            if (typeof mod[i] === 'undefined')
+                return i;
+        }
+        return -1;
     }
 
     function mod_release(module, i) {
-        module.splice(i, 1);
+        delete module[i];
     }
 
 
@@ -378,7 +384,11 @@ $(document).ready(function() {
     ////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     /////////////// function settings ////////////////////////////////////////
-    var interval = setInterval(working, 2000);
+
+    var interval;
+    document.getElementById('button').addEventListener("click", function() {
+        interval = setInterval(working, 1000 * fps);
+    })
 
     function working() {
         //////// running stage of the application
@@ -515,25 +525,25 @@ $(document).ready(function() {
 
 
         //FP adders
-        (mod_adder.length > 0) ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'grey';
+        (typeof mod_adder[0] !== 'undefined') ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'grey';
         if (stopper > 0) ctx.fillStyle = 'grey';
         ctx.fillRect(620 - 250, 540 + 100, 150, 30);
-        (mod_adder.length > 1) ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'black';
+        (typeof mod_adder[1] !== 'undefined') ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'black';
         if (stopper > 0) ctx.fillStyle = 'black';
         ctx.fillRect(650 - 250, 550 + 100, 150, 30);
-        (mod_adder.length > 2) ? ctx.fillStyle = '#a3a3c2': ctx.fillStyle = 'grey';
+        (typeof mod_adder[2] !== 'undefined') ? ctx.fillStyle = '#a3a3c2': ctx.fillStyle = 'grey';
         if (stopper > 0) ctx.fillStyle = 'grey';
         ctx.fillRect(680 - 250, 560 + 100, 150, 30);
-        (mod_adder.length > 3) ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'black';
+        (typeof mod_adder[3] !== 'undefined') ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'black';
         if (stopper > 0) ctx.fillStyle = 'black';
         ctx.fillRect(710 - 250, 570 + 100, 150, 30);
         ctx.fillStyle = 'black';
         ctx.moveTo(535, 600 + 100);
         ctx.lineTo(535, 630 + 100);
         //addition
-        if (mod_adder.length > 0) {
-            var rem = [];
-            for (let i = 0; i < mod_adder.length; i++) {
+        console.log("the length of the add moder ", mod_adder.length);
+        for (let i = 0; i < add_mod_number; i++) {
+            if (typeof mod_adder[i] !== 'undefined') {
                 if (mod_adder[i].time + add_t === clk) {
                     if (test[mod_adder[i].tag].operation === "ADC")
                         reg[mod_adder[i].dst].value = mod_adder[i].addition();
@@ -544,26 +554,27 @@ $(document).ready(function() {
                     reg[mod_adder[i].dst].lock = false;
                     test[mod_adder[i].tag].write_time = clk;
                     test[mod_adder[i].tag].finished = true;
-                    rem.push(i);
+                    // rem.push(i);
+                    mod_release(mod_adder, i);
                     // console.log("Executed from the alu at ", clk);
                 }
             }
-            for (let i = 0; i < rem.length; i++) {
-                mod_release(mod_adder, rem[i]);
-            }
+            // for (let i = 0; i < rem.length; i++) {
+            //     mod_release(mod_adder, rem[i]);
+            // }
         }
 
 
         //FP multiplier
-        (mod_mult.length > 0) ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'grey';
+        (typeof mod_mult[0] !== 'undefined') ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'grey';
         if (stopper > 0) ctx.fillStyle = 'grey';
         ctx.fillRect(940 - 250, 520 + 100, 150, 30);
 
-        (mod_mult.length > 1) ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'black';
+        (typeof mod_mult[1] !== 'undefined') ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'black';
         if (stopper > 0) ctx.fillStyle = 'black';
         ctx.fillRect(970 - 250, 530 + 100, 150, 30);
 
-        (mod_mult.length > 2) ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'grey';
+        (typeof mod_mult[2] !== 'undefined') ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'grey';
         if (stopper > 0) ctx.fillStyle = 'grey';
         ctx.fillRect(1000 - 250, 540 + 100, 150, 30);
 
@@ -571,9 +582,8 @@ $(document).ready(function() {
         ctx.moveTo(1075 - 250, 570 + 100);
         ctx.lineTo(1075 - 250, 630 + 100);
         //multiplication
-        if (mod_mult.length > 0) {
-            var rem = [];
-            for (let i = 0; i < mod_mult.length; i++) {
+        for (let i = 0; i < mult_mod_number; i++) {
+            if (typeof mod_mult[i] !== 'undefined') {
                 if (mod_mult[i].time + mult_t === clk) {
                     reg[mod_mult[i].dst].value = mod_mult[i].multiplication();
                     reg[mod_mult[i].dst].lock = false;
@@ -581,32 +591,32 @@ $(document).ready(function() {
                     test[mod_mult[i].tag].finished = true;
                     // console.log(mod_adder[i].tag, "fdsfsfsfs is the index");
                     // console.log("the condition of test", mod_adder[i].tag, "is", test[mod_adder[i].tag])
-                    rem.push(i);
+                    mod_release(mod_mult, i);
                 }
             }
-            for (let i = 0; i < rem.length; i++) {
-                mod_release(mod_mult, rem[i]);
-            }
+            // for (let i = 0; i < rem.length; i++) {
+            //     mod_release(mod_mult, rem[i]);
+            // }
         }
 
 
         //binary operations 
-        (mod_bin.length > 0) ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'grey';
+        (typeof mod_bin[0] !== 'undefined') ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'grey';
         if (stopper > 0) ctx.fillStyle = 'grey';
         ctx.fillRect(1150 - 250, 500 + 100, 150, 30);
-        (mod_bin.length > 1) ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'black';
+        (typeof mod_bin[1] !== 'undefined') ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'black';
         if (stopper > 0) ctx.fillStyle = 'black';
         ctx.fillRect(1160 - 250, 510 + 100, 150, 30);
 
-        (mod_bin.length > 2) ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'grey';
+        (typeof mod_bin[2] !== 'undefined') ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'grey';
         if (stopper > 0) ctx.fillStyle = 'grey';
         ctx.fillRect(1170 - 250, 520 + 100, 150, 30);
 
-        (mod_bin.length > 3) ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'black';
+        (typeof mod_bin[3] !== 'undefined') ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'black';
         if (stopper > 0) ctx.fillStyle = 'black';
         ctx.fillRect(1180 - 250, 530 + 100, 150, 30);
 
-        (mod_bin.length > 4) ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'grey';
+        (typeof mod_bin[4] !== 'undefined') ? ctx.fillStyle = '#00cc44': ctx.fillStyle = 'grey';
         if (stopper > 0) ctx.fillStyle = 'grey';
         ctx.fillRect(1190 - 250, 540 + 100, 150, 30);
 
@@ -616,9 +626,8 @@ $(document).ready(function() {
         ctx.stroke();
 
         //binary operations 
-        if (mod_bin.length > 0) {
-            var rem = [];
-            for (let i = 0; i < mod_bin.length; i++) {
+        for (let i = 0; i < bin_mod_number; i++) {
+            if (typeof mod_bin[i] !== 'undefined') {
                 if (mod_bin[i].time + bin_t === clk) {
                     if (test[mod_bin[i].tag].operation === "CMP")
                         reg[mod_bin[i].dst].value = mod_bin[i].complement();
@@ -635,13 +644,13 @@ $(document).ready(function() {
                     test[mod_bin[i].tag].finished = true;
                     // console.log(mod_adder[i].tag, "fdsfsfsfs is the index");
                     // console.log("the condition of test", mod_adder[i].tag, "is", test[mod_adder[i].tag])
-                    rem.push(i);
+                    mod_release(mod_bin, i);
                     // console.log("Executed from the alu at ", clk);
                 }
             }
-            for (let i = 0; i < rem.length; i++) {
-                mod_release(mod_bin, rem[i]);
-            }
+            // for (let i = 0; i < rem.length; i++) {
+            //     mod_release(mod_bin, rem[i]);
+            // }
         }
 
 
@@ -765,7 +774,7 @@ $(document).ready(function() {
         //in case of going to an adder
         for (let i = 0; i < add_rs_number; i++) {
             if (rs_add[i].finish === false) {
-                var blank = check_full(mod_adder);
+                var blank = check_full(mod_adder, add_mod_number);
                 if (!rs_add[i].check() && blank !== -1) {
                     // console.log("THE BLANK VALUE ", blank);
                     // console.log("Dispatch to the alu at time ", clk);
@@ -850,7 +859,7 @@ $(document).ready(function() {
         //in case of multiplication 
         for (let i = 0; i < mult_rs_number; i++) {
             if (rs_mult[i].finish === false) {
-                var blank = check_full(mod_mult);
+                var blank = check_full(mod_mult, mult_mod_number);
                 if (!rs_mult[i].check() && blank !== -1) {
                     // console.log("THE BLANK VALUE ", blank);
                     // console.log("Dispatch to the alu at time ", clk);
@@ -951,7 +960,7 @@ $(document).ready(function() {
         //in case of binary operations
         for (let i = 0; i < bin_rs_number; i++) {
             if (rs_bin[i].finish === false) {
-                var blank = check_full(mod_bin);
+                var blank = check_full(mod_bin, bin_mod_number);
                 if (!rs_bin[i].check() && blank !== -1) {
                     // console.log("THE BLANK VALUE ", blank);
                     // console.log("Dispatch to the alu at time ", clk);
