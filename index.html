@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tomosulo Algorithm</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="node_modules/@petamoriken/float16/browser/float16.js"></script>
+    <script>
+        const {
+            Float16Array,
+            getFloat16,
+            setFloat16,
+            hfround
+        } = float16;
+    </script>
+    <script src="index.js"></script>
+    <!-- <link rel="stylesheet" href="style.css"> -->
+</head>
+
+<body>
+
+    <div class="container1">
+        <h1>Implementing the tomosulo </h1>
+        <form calss="fp-registers">
+            R0 : <input type="text" id="R0" value="0">
+            <br> R1 : <input type="text" id="R1" value="1">
+            <br> R2 : <input type="text" id="R2" value="2">
+            <br> R3 : <input type="text" id="R3" value="3">
+            <br> R4 : <input type="text" id="R4" value="4">
+            <br> R5 : <input type="text" id="R5" value="16">
+            <br> R6 : <input type="text" id="R6" value="6">
+            <br> R7 : <input type="text" id="R7" value="7">
+            <br> R8 : <input type="text" id="R8" value="8">
+            <br> R9 : <input type="text" id="R9" value="9">
+            <br> R10 : <input type="text" id="R10" value="10">
+            <br> R11 : <input type="text" id="R11" value="11">
+            <br> R12 : <input type="text" id="R12" value="8">
+            <br> R13 : <input type="text" id="R13" value="9">
+            <br> R14 : <input type="text" id="R14" value="10">
+            <br> R15 : <input type="text" id="R15" value="16">
+        </form>
+
+        <h1>Loading register station</h1>
+        <form class="buffer-registers">
+            F0 : <input type="text" id="F0" value="0">
+            <br> F1 : <input type="text" id="F1" value="1">
+            <br> F2 : <input type="text" id="F2" value="2">
+            <br> F3 : <input type="text" id="F3" value="1">
+            <br> F4 : <input type="text" id="F4" value="9">
+            <br> F5 : <input type="text" id="F5" value="8">
+        </form>
+    </div>
+
+    <h2>The instruction list</h2>
+
+    <br>
+    <form id="frm1">
+        <br> Instruction 0: <input type="text" id="i0" value="XOR R3 R2 R1">
+        <br>Instruction 1: <input type="text" id="i1" value="ADC R1 R2 R6">
+        <br>Instruction 2: <input type="text" id="i1" value="ADD R4 R5 R2">
+        <br>Instruction 3: <input type="text" id="i1" value="MULT R1 R7 R5">
+    </form>
+
+</body>
+
+<canvas id="canvas" width="1150" height="750" style="border:1px solid #000000;">
+</canvas>
+
+
+
+
+</html>
