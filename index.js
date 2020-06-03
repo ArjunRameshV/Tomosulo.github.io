@@ -57,10 +57,10 @@ $(document).ready(function() {
     // view.setFloat16(0, Math.PI, true);
     // view.getFloat16(0, true); // 3.140625
 
-    const float16 = new Float16Array([1.0, -1.1, 1.2]);
-    for (const val of float16) {
-        console.log(val); // => 1, 1.099609375, 1.19921875
-    }
+    // const float16 = new Float16Array([1.0, -1.1, 1.2]);
+    // for (const val of float16) {
+    //     console.log(val); // => 1, 1.099609375, 1.19921875
+    // }
     // console.log(float16[1]);
     // console.log("sfsfdsffds ", float16[0] + float16[2]);
     // var pre = new Float16Array(float16[0] + float16[2])
