@@ -1,5 +1,5 @@
 input[type=text] {
-    width: 80px;
+    width: 150px;
     padding: 8px 25px;
     margin: 8px 0;
     box-sizing: border-box;
@@ -19,7 +19,7 @@ input[type=text] {
 }
 
 #frm1 input[type=text] {
-    width: 160px;
+    width: 200px;
 }
 
 .gtable {

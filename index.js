@@ -1,6 +1,8 @@
 $(document).ready(function() {
 
 
+    /// ratatatata !
+
     //ceartain global values 
     const pmax = 65535
     const nmax = -65536 // equivalent to minus zero
@@ -16,7 +18,7 @@ $(document).ready(function() {
     const bin_mod_number = 5
     const load_mod_number = 3
     const freg_number = 6
-    const fps = 1;
+    const fps = 5;
     const add_t = 3;
     const mult_t = 10;
     const load_t = 2;
@@ -40,25 +42,25 @@ $(document).ready(function() {
     // }
 
 
-    // const buffer = new ArrayBuffer(10);
+    // const buffer = new ArrayBuffer(11.2);
     // const view = new DataView(buffer);
 
-    // view.setUint16(0, -2.5);
-    // console.log(getFloat16(view, 0)); // 0.0007572174072265625
+    // // console.log("aha ", view.setUint16(0, -2.5));
+    // console.log("aha ", getFloat16(view, 1.2)); // 0.0007572174072265625
 
-    // // You can append to DataView instance
+    // // // You can append to DataView instance
     // view.getFloat16 = (...args) => getFloat16(view, ...args);
     // view.setFloat16 = (...args) => setFloat16(view, ...args);
 
-    // console.log(view.getFloat16(0), " the actual view of the thing"); // 0.0007572174072265625
+    // console.log(view.getFloat16(0.5), " the actual view of the thing"); // 0.0007572174072265625
 
     // view.setFloat16(0, Math.PI, true);
     // view.getFloat16(0, true); // 3.140625
 
-    // const float16 = new Float16Array([1.0, -1.1, 1.2]);
-    // for (const val of float16) {
-    //     console.log(val); // => 1, 1.099609375, 1.19921875
-    // }
+    const float16 = new Float16Array([1.0, -1.1, 1.2]);
+    for (const val of float16) {
+        console.log(val); // => 1, 1.099609375, 1.19921875
+    }
     // console.log(float16[1]);
     // console.log("sfsfdsffds ", float16[0] + float16[2]);
     // var pre = new Float16Array(float16[0] + float16[2])
@@ -74,7 +76,7 @@ $(document).ready(function() {
     // cpu registers
     function create_FRegisters(i) {
         return {
-            value: int16(parseInt(document.getElementById("R" + i).value)),
+            value: Number(document.getElementById("R" + i).value),
             tag: 0,
             lock: false
         };
@@ -83,7 +85,7 @@ $(document).ready(function() {
     // cahce regiaters
     function create_CRegisters(i) {
         return {
-            value: int16(parseInt(document.getElementById("F" + i).value)),
+            value: Number(document.getElementById("F" + i).value),
             lock: false, // for now no cahce misses
         }
     }
@@ -278,6 +280,10 @@ $(document).ready(function() {
             }
             return 0;
         }
+        floating_point_addition() {
+            const float16 = new Float16Array([this.a + this.b]);
+            return this.a + this.b
+        }
     }
 
     class mult_mod {
@@ -293,6 +299,9 @@ $(document).ready(function() {
 
         multiplication() {
             return int16(this.a * this.b);
+        }
+        floating_point_multiplication() {
+            return this.a * this.b;
         }
     }
 
@@ -402,9 +411,6 @@ $(document).ready(function() {
     var incomplete = true;
     var stopper = 0;
 
-    //coloring the wires  (sad truth)
-    var trs3 = 0;
-    var the_green_table = 0;
 
     ////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -807,7 +813,7 @@ $(document).ready(function() {
         for (let i = 0; i < rs_store.length; i++) {
             if (typeof rs_store[i] !== 'undefined') {
                 if (rs_store[i].time + store_t === clk && !rs_store[i].check()) {
-                    rs_store[i].f.value = int16(rs_store[i].r.value);
+                    rs_store[i].f.value = rs_store[i].r.value;
                     rs_store[i].f.lock = false;
                     test[rs_store[i].ip].write_time = clk;
                     test[rs_store[i].ip].finished = true;
@@ -867,6 +873,8 @@ $(document).ready(function() {
                         reg[reg_index].value = mod_adder[i].subtraction();
                     else if (test[mod_adder[i].tag].operation === "ADD")
                         reg[reg_index].value = mod_adder[i].addition_without_carry();
+                    else if (test[mod_adder[i].tag].operation === "FAD")
+                        reg[reg_index].value = mod_adder[i].floating_point_addition();
                     reg[reg_index].lock = false;
                     test[mod_adder[i].tag].write_time = clk;
                     test[mod_adder[i].tag].finished = true;
@@ -896,7 +904,10 @@ $(document).ready(function() {
                 if (mod_mult[i].time + mult_t === clk) {
                     let t_index = mod_adder[i].tag;
                     let reg_index = (test[t_index].dst.length === 2) ? [parseInt(test[t_index].dst[1])] : [parseInt(test[t_index].dst[1] + test[t_index].dst[2])]
-                    reg[reg_index].value = mod_mult[i].multiplication();
+                    if (test[t_index].operation === "MULT")
+                        reg[reg_index].value = mod_mult[i].multiplication();
+                    else if (test[t_index].operation === "FMUL")
+                        reg[reg_index].value = mod_mult[i].floating_point_multiplication();
                     reg[reg_index].lock = false;
                     test[mod_mult[i].tag].write_time = clk;
                     test[mod_mult[i].tag].finished = true;
@@ -923,19 +934,21 @@ $(document).ready(function() {
         for (let i = 0; i < bin_mod_number; i++) {
             if (typeof mod_bin[i] !== 'undefined') {
                 if (mod_bin[i].time + bin_t === clk) {
-                    if (test[mod_bin[i].tag].operation === "CMP")
-                        reg[mod_bin[i].dst].value = mod_bin[i].complement();
-                    else if (test[mod_bin[i].tag].operation === "XOR")
-                        reg[mod_bin[i].dst].value = mod_bin[i].xor();
-                    else if (test[mod_bin[i].tag].operation === "NAND")
-                        reg[mod_bin[i].dst].value = mod_bin[i].nand();
-                    else if (test[mod_bin[i].tag].operation === "LHR")
-                        reg[mod_bin[i].dst].value = mod_bin[i].lshift();
-                    else if (test[mod_bin[i].tag].operation === "SHR")
-                        reg[mod_bin[i].dst].value = mod_bin[i].rshift();
-                    reg[mod_bin[i].dst].lock = false;
-                    test[mod_bin[i].tag].write_time = clk;
-                    test[mod_bin[i].tag].finished = true;
+                    let t_index = mod_bin[i].tag;
+                    let reg_index = (test[t_index].dst.length === 2) ? [parseInt(test[t_index].dst[1])] : [parseInt(test[t_index].dst[1] + test[t_index].dst[2])]
+                    if (test[t_index].operation === "CMP")
+                        reg[reg_index].value = mod_bin[i].complement();
+                    else if (test[t_index].operation === "XOR")
+                        reg[reg_index].value = mod_bin[i].xor();
+                    else if (test[t_index].operation === "NAND")
+                        reg[reg_index].value = mod_bin[i].nand();
+                    else if (test[t_index].operation === "LHR")
+                        reg[reg_index].value = mod_bin[i].lshift();
+                    else if (test[t_index].operation === "SHR")
+                        reg[reg_index].value = mod_bin[i].rshift();
+                    reg[reg_index].lock = false;
+                    test[t_index].write_time = clk;
+                    test[t_index].finished = true;
                     mod_release(mod_bin, i);
                 }
             }
@@ -954,7 +967,10 @@ $(document).ready(function() {
                 if (!rs_add[i].check() && blank !== -1) {
                     rs_add[i].finish = true;
                     test[rs_add[i].ip].exe_time = clk;
-                    mod_adder[blank] = new add_mod(int16(rs_add[i].r1.value), int16(rs_add[i].r2.value), int16(rs_add[i].dst.value), clk, rs_add[i].ip);
+                    if (test[rs_add[i].ip].operation !== 'FAD')
+                        mod_adder[blank] = new add_mod(int16(rs_add[i].r1.value), int16(rs_add[i].r2.value), int16(rs_add[i].dst.value), clk, rs_add[i].ip);
+                    else
+                        mod_adder[blank] = new add_mod(rs_add[i].r1.value, rs_add[i].r2.value, rs_add[i].dst.value, clk, rs_add[i].ip);
                     rs_add[i] = new add_rs();
                 }
             }
@@ -969,7 +985,10 @@ $(document).ready(function() {
                     // console.log("Dispatch to the alu at time ", clk);
                     rs_mult[i].finish = true;
                     test[rs_mult[i].ip].exe_time = clk;
-                    mod_mult[blank] = new mult_mod(int16(rs_mult[i].r1.value), int16(rs_mult[i].r2.value), int16(rs_mult[i].dst.value), clk, rs_mult[i].ip);
+                    if (test[rs_add[i].ip].operation !== 'FMUL')
+                        mod_mult[blank] = new mult_mod(int16(rs_mult[i].r1.value), int16(rs_mult[i].r2.value), int16(rs_mult[i].dst.value), clk, rs_mult[i].ip);
+                    else
+                        mod_mult[blank] = new mult_mod(rs_mult[i].r1.value, rs_mult[i].r2.value, rs_mult[i].dst.value, clk, rs_mult[i].ip);
                     rs_mult[i] = new mult_rs();
                 }
             }
@@ -1058,7 +1077,7 @@ $(document).ready(function() {
                         i = i + store_rs_number;
                     }
                 }
-            } else if ((test[j].operation === "ADC" || test[j].operation === "SUB" || test[j].operation === "ADD") && test[j].finished === false && test[j].rs_tag === -1) {
+            } else if ((test[j].operation === "ADC" || test[j].operation === "SUB" || test[j].operation === "ADD" || test[j].operation === "FAD") && test[j].finished === false && test[j].rs_tag === -1) {
                 t_index = j;
                 for (let i = 0; i < add_rs_number; i++) {
                     if (rs_add[i].finish === true) {
@@ -1078,7 +1097,7 @@ $(document).ready(function() {
                         i = i + add_rs_number; // to not check other reservation stations
                     }
                 }
-            } else if (test[j].operation === "MULT" && test[j].finished === false && test[j].rs_tag === -1) {
+            } else if ((test[j].operation === "MULT" || test[j].operation === "FMUL") && test[j].finished === false && test[j].rs_tag === -1) {
                 t_index = j;
                 for (let i = 0; i < mult_rs_number; i++) {
                     if (rs_mult[i].finish === true) {
@@ -1107,9 +1126,9 @@ $(document).ready(function() {
                         rs_bin[i].pos2 = (test[j].operation !== "CMP") ? (test[t_index].reg2.length === 2) ? parseInt(test[t_index].reg2[1]) : parseInt(test[t_index].reg2[1] + test[t_index].reg2[2]) : null;
                         rs_bin[i].pos3 = (test[t_index].dst.length === 2) ? parseInt(test[t_index].dst[1]) : parseInt(test[t_index].dst[1] + test[t_index].dst[2]);
 
-                        rs_bin[i].r1 = rs_bin[i].pos1;
+                        rs_bin[i].r1 = reg[rs_bin[i].pos1];
                         rs_bin[i].r2 = (test[j].operation !== "CMP") ? reg[rs_bin[i].pos2] : null;
-                        rs_bin[i].dst = rs_bin[i].pos3;
+                        rs_bin[i].dst = reg[rs_bin[i].pos3];
 
                         rs_bin[i].ip = t_index;
                         test[t_index].rs_tag = i;
