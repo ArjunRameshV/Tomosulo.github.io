@@ -16,7 +16,7 @@ $(document).ready(function() {
     const bin_mod_number = 5
     const load_mod_number = 3
     const freg_number = 6
-    const fps = 3;
+    const fps = 1;
     const add_t = 3;
     const mult_t = 10;
     const load_t = 2;
@@ -199,6 +199,7 @@ $(document).ready(function() {
             this.reg1 = str[2]
             this.reg2 = 0 // may be a register or an incermental value
             this.additional_condition
+            this.tagline = str;
             if (this.operation !== "LOAD") {
                 this.reg2 = (str.length > 3) ? str[3] : 0
             } else {
@@ -221,6 +222,10 @@ $(document).ready(function() {
             this.write_time = 0
             this.rs_tag = -1 // reservation tag
             this.finished = false // to indicate termination 
+        }
+
+        wireCheck() {
+            return this.finished;
         }
     }
 
@@ -399,6 +404,7 @@ $(document).ready(function() {
 
     //coloring the wires  (sad truth)
     var trs3 = 0;
+    var the_green_table = 0;
 
     ////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -416,11 +422,10 @@ $(document).ready(function() {
         ctx.beginPath();
         ctx.lineWidth = 3;
         ctx.strokeStyle = 'blue';
-        ctx.moveTo(675 - 250, 230);
-        ctx.lineTo(675 - 250, 240);
 
         // connection to load and store 
-        ctx.moveTo(675 - 250, 260);
+        ctx.moveTo(675 - 250, 230);
+        ctx.lineTo(675 - 250, 260);
         ctx.lineTo(500 - 250, 260);
         ctx.lineTo(500 - 250, 300);
         ctx.stroke();
@@ -433,22 +438,36 @@ $(document).ready(function() {
         ctx.lineTo(175, 300);
         ctx.lineTo(175, 350);
         ctx.stroke();
+        //the rest of the connections from the instruction queue
         ctx.beginPath();
-        ctx.strokeStyle = 'blue';
+        ctx.strokeStyle = test.some((x) => x.finished) ? '#33ccff' : 'blue';
         ctx.moveTo(675 - 250, 230);
         ctx.lineTo(675 - 250, 430);
+        ctx.stroke();
 
-        ctx.moveTo(620 - 250, 430);
-        ctx.lineTo(1140 - 250, 430);
-
-        ctx.moveTo(620 - 250, 430);
+        //  > connection to rs 1
+        ctx.beginPath();
+        ctx.strokeStyle = 'blue';
+        ctx.moveTo(675 - 250, 430);
+        ctx.lineTo(620 - 250, 430);
         ctx.lineTo(620 - 250, 450);
+        ctx.stroke();
 
-        ctx.moveTo(920 - 250, 430);
+        //  > connection to rs2
+        ctx.beginPath();
+        ctx.strokeStyle = 'blue';
+        ctx.moveTo(675 - 250, 430);
+        ctx.lineTo(920 - 250, 430);
         ctx.lineTo(920 - 250, 460);
+        ctx.stroke();
 
-        ctx.moveTo(1140 - 250, 430);
+        //  > connection to rs3
+        ctx.beginPath();
+        ctx.strokeStyle = 'blue';
+        ctx.moveTo(675 - 250, 430);
+        ctx.lineTo(1140 - 250, 430);
         ctx.lineTo(1140 - 250, 460);
+        ctx.stroke();
         ctx.stroke();
 
         // the load operation
@@ -706,6 +725,7 @@ $(document).ready(function() {
             if (!rs_bin[i].finish)
                 dot = 1;
             if (dot) {
+                // console.log("this is the third reservation station ", rs_bin[i]);
                 ctx.fillStyle = "#1a75ff";
                 ctx.fillRect(1120 - 250, 360 + 100 + i * 20, 40, 20);
                 ctx.fillStyle = (rs_bin[i].r1.lock) ? "#2eb8b8" : "#1a75ff";
@@ -776,10 +796,11 @@ $(document).ready(function() {
             ctx.stroke();
         }
 
+        ctx.beginPath();
         ctx.strokeStyle = 'black';
         ctx.moveTo(150, 430);
-        ctx.lineTo(150, 475)
-        ctx.lineTo(210, 475)
+        ctx.lineTo(150, 475);
+        ctx.lineTo(210, 475);
         ctx.stroke();
 
         // in case of store
@@ -1043,9 +1064,9 @@ $(document).ready(function() {
                     if (rs_add[i].finish === true) {
                         console.log("we have been alloted a reservation station at ", clk);
                         rs_add[i].finish = false;
-                        rs_add[i].pos1 = (test[t_index].reg1.length === 2) ? [parseInt(test[t_index].reg1[1])] : [parseInt(test[t_index].reg1[1] + test[t_index].reg1[2])];
-                        rs_add[i].pos2 = (test[t_index].reg2.length === 2) ? [parseInt(test[t_index].reg2[1])] : [parseInt(test[t_index].reg2[1] + test[t_index].reg2[2])];
-                        rs_add[i].pos3 = (test[t_index].dst.length === 2) ? [parseInt(test[t_index].dst[1])] : [parseInt(test[t_index].dst[1] + test[t_index].dst[2])];
+                        rs_add[i].pos1 = (test[t_index].reg1.length === 2) ? parseInt(test[t_index].reg1[1]) : parseInt(test[t_index].reg1[1] + test[t_index].reg1[2]);
+                        rs_add[i].pos2 = (test[t_index].reg2.length === 2) ? parseInt(test[t_index].reg2[1]) : parseInt(test[t_index].reg2[1] + test[t_index].reg2[2]);
+                        rs_add[i].pos3 = (test[t_index].dst.length === 2) ? parseInt(test[t_index].dst[1]) : parseInt(test[t_index].dst[1] + test[t_index].dst[2]);
                         rs_add[i].r1 = reg[rs_add[i].pos1]
                         rs_add[i].r2 = reg[rs_add[i].pos2]
                         rs_add[i].dst = reg[rs_add[i].pos3]
@@ -1062,9 +1083,9 @@ $(document).ready(function() {
                 for (let i = 0; i < mult_rs_number; i++) {
                     if (rs_mult[i].finish === true) {
                         rs_mult[i].finish = false;
-                        rs_mult[i].pos1 = (test[t_index].reg1.length === 2) ? [parseInt(test[t_index].reg1[1])] : [parseInt(test[t_index].reg1[1] + test[t_index].reg1[2])];
-                        rs_mult[i].pos2 = (test[t_index].reg2.length === 2) ? [parseInt(test[t_index].reg2[1])] : [parseInt(test[t_index].reg2[1] + test[t_index].reg2[2])];
-                        rs_mult[i].pos3 = (test[t_index].dst.length === 2) ? [parseInt(test[t_index].dst[1])] : [parseInt(test[t_index].dst[1] + test[t_index].dst[2])];
+                        rs_mult[i].pos1 = (test[t_index].reg1.length === 2) ? parseInt(test[t_index].reg1[1]) : parseInt(test[t_index].reg1[1] + test[t_index].reg1[2]);
+                        rs_mult[i].pos2 = (test[t_index].reg2.length === 2) ? parseInt(test[t_index].reg2[1]) : parseInt(test[t_index].reg2[1] + test[t_index].reg2[2]);
+                        rs_mult[i].pos3 = (test[t_index].dst.length === 2) ? parseInt(test[t_index].dst[1]) : parseInt(test[t_index].dst[1] + test[t_index].dst[2]);
                         rs_mult[i].r1 = rs_mult[i].pos1;
                         rs_mult[i].r2 = rs_mult[i].pos2;
                         rs_mult[i].dst = rs_mult[i].pos3;
@@ -1082,9 +1103,9 @@ $(document).ready(function() {
                     if (rs_bin[i].finish === true) {
                         // console.log("we have been alloted a reservation station at ", clk);
                         rs_bin[i].finish = false;
-                        rs_bin[i].pos1 = (test[t_index].reg1.length === 2) ? reg[parseInt(test[t_index].reg1[1])] : reg[parseInt(test[t_index].reg1[1] + test[t_index].reg1[2])];
-                        rs_bin[i].pos2 = (test[j].operation !== "CMP") ? (test[t_index].reg2.length === 2) ? [parseInt(test[t_index].reg2[1])] : [parseInt(test[t_index].reg2[1] + test[t_index].reg2[2])] : null;
-                        rs_bin[i].pos3 = (test[t_index].dst.length === 2) ? reg[parseInt(test[t_index].dst[1])] : reg[parseInt(test[t_index].dst[1] + test[t_index].dst[2])];
+                        rs_bin[i].pos1 = (test[t_index].reg1.length === 2) ? parseInt(test[t_index].reg1[1]) : parseInt(test[t_index].reg1[1] + test[t_index].reg1[2]);
+                        rs_bin[i].pos2 = (test[j].operation !== "CMP") ? (test[t_index].reg2.length === 2) ? parseInt(test[t_index].reg2[1]) : parseInt(test[t_index].reg2[1] + test[t_index].reg2[2]) : null;
+                        rs_bin[i].pos3 = (test[t_index].dst.length === 2) ? parseInt(test[t_index].dst[1]) : parseInt(test[t_index].dst[1] + test[t_index].dst[2]);
 
                         rs_bin[i].r1 = rs_bin[i].pos1;
                         rs_bin[i].r2 = (test[j].operation !== "CMP") ? reg[rs_bin[i].pos2] : null;
@@ -1123,6 +1144,7 @@ $(document).ready(function() {
         // termination 
 
         if (stopper === 1) {
+            green_table();
             clearInterval(interval);
         }
 
@@ -1141,6 +1163,14 @@ $(document).ready(function() {
     }
     // end of working
 
+    function green_table() {
 
+        for (let i = 0; i < test.length; i++) {
+            document.getElementById('inst' + i).innerHTML = test[i].tagline;
+            document.getElementById('ist' + i).innerHTML = test[i].issue_time + 1;
+            document.getElementById('wbt' + i).innerHTML = test[i].exe_time + 1;
+            document.getElementById('ext' + i).innerHTML = test[i].write_time + 1;
+        }
+    }
 
 });

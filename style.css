@@ -1,10 +1,47 @@
-.container1 {
-    display: grid;
-    grid-template-columns: auto auto auto auto;
-    grid-gap: 10px;
+input[type=text] {
+    width: 80px;
+    padding: 8px 25px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    /* border: solid #cccccc; */
+    /* -webkit-transition: 0.5s; */
+    /* transition: 0.5s; */
+    /* outline: none; */
 }
 
-.container1>form {
-    display: grid;
-    grid-column: 200px 200px;
+.container1 {
+    height: 550px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+#frm1 input[type=text] {
+    width: 160px;
+}
+
+.gtable {
+    display: flex;
+    justify-content: center;
+}
+
+table {
+    max-width: 100%;
+}
+
+.gtable tr:nth-child(odd) {
+    background-color: #eeeeee;
+}
+
+.gtable th {
+    background-color: #555555;
+    color: #ffffff;
+}
+
+.gtable th,
+td {
+    text-align: center;
+    padding: 0.5rem 1rem;
 }

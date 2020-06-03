@@ -17,41 +17,50 @@
         } = float16;
     </script>
     <script src="index.js"></script>
-    <!-- <link rel="stylesheet" href="style.css"> -->
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+    <header>
+        <h1>Implementing the tomosulo </h1>
+    </header>
 
     <div class="container1">
-        <h1>Implementing the tomosulo </h1>
-        <form calss="fp-registers">
-            R0 : <input type="text" id="R0" value="0">
-            <br> R1 : <input type="text" id="R1" value="1">
-            <br> R2 : <input type="text" id="R2" value="2">
-            <br> R3 : <input type="text" id="R3" value="3">
-            <br> R4 : <input type="text" id="R4" value="4">
-            <br> R5 : <input type="text" id="R5" value="16">
-            <br> R6 : <input type="text" id="R6" value="6">
-            <br> R7 : <input type="text" id="R7" value="7">
-            <br> R8 : <input type="text" id="R8" value="8">
-            <br> R9 : <input type="text" id="R9" value="9">
-            <br> R10 : <input type="text" id="R10" value="10">
-            <br> R11 : <input type="text" id="R11" value="11">
-            <br> R12 : <input type="text" id="R12" value="8">
-            <br> R13 : <input type="text" id="R13" value="9">
-            <br> R14 : <input type="text" id="R14" value="10">
-            <br> R15 : <input type="text" id="R15" value="16">
-        </form>
-
-        <h1>Loading register station</h1>
-        <form class="buffer-registers">
-            F0 : <input type="text" id="F0" value="0">
-            <br> F1 : <input type="text" id="F1" value="1">
-            <br> F2 : <input type="text" id="F2" value="2">
-            <br> F3 : <input type="text" id="F3" value="1">
-            <br> F4 : <input type="text" id="F4" value="9">
-            <br> F5 : <input type="text" id="F5" value="8">
-        </form>
+        <div class="freg1">
+            <form calss="fp-registers">
+                <br> R0 : <input type="text" id="R0" value="0">
+                <br> R1 : <input type="text" id="R1" value="1">
+                <br> R2 : <input type="text" id="R2" value="2">
+                <br> R3 : <input type="text" id="R3" value="3">
+                <br> R4 : <input type="text" id="R4" value="4">
+                <br> R5 : <input type="text" id="R5" value="16">
+                <br> R6 : <input type="text" id="R6" value="6">
+                <br> R7 : <input type="text" id="R7" value="7">
+            </form>
+        </div>
+        <div class="freg2">
+            <form class="fp-registers-2">
+                <br> R8 : <input type="text" id="R8" value="8">
+                <br> R9 : <input type="text" id="R9" value="9">
+                <br> R10 : <input type="text" id="R10" value="10">
+                <br> R11 : <input type="text" id="R11" value="11">
+                <br> R12 : <input type="text" id="R12" value="8">
+                <br> R13 : <input type="text" id="R13" value="9">
+                <br> R14 : <input type="text" id="R14" value="10">
+                <br> R15 : <input type="text" id="R15" value="16">
+            </form>
+        </div>
+        <div class="breg">
+            <form class="buffer-registers">
+                <h3>Loading register station</h3>
+                F0 : <input type="text" id="F0" value="0">
+                <br> F1 : <input type="text" id="F1" value="1">
+                <br> F2 : <input type="text" id="F2" value="2">
+                <br> F3 : <input type="text" id="F3" value="1">
+                <br> F4 : <input type="text" id="F4" value="9">
+                <br> F5 : <input type="text" id="F5" value="8">
+            </form>
+        </div>
     </div>
 
     <h2>The instruction list</h2>
@@ -62,18 +71,57 @@
         <br>Instruction 1: <input type="text" id="i1" value="ADC R1 R2 R6">
         <br>Instruction 2: <input type="text" id="i1" value="ADD R4 R5 R2">
         <br>Instruction 3: <input type="text" id="i1" value="LOAD R1 F2">
+        <br>Instruction 4: <input type="text" id="i1" value="ADD R10 R4 R5">
     </form>
 
 </body>
 
 <input id="button" type="submit" name="button" value="START" />
-
+<!-- <input id="button" type="submit" name="button" value="RESET" /> -->
 <br><br><br>
 
 <canvas id="canvas" width="1150" height="750" style="border:1px solid #000000;">
 </canvas>
 
-
-
+<div id='gtable' class='gtable'>
+    <table>
+        <tr>
+            <th>The instruction</th>
+            <th>Issue Time</th>
+            <th>Execution Start Time</th>
+            <th>Write Back</th>
+        </tr>
+        <tr>
+            <td id='inst0'> </td>
+            <td id='ist0'> </td>
+            <td id='wbt0'> </td>
+            <td id='ext0'> </td>
+        </tr>
+        <tr>
+            <td id='inst1'> </td>
+            <td id='ist1'> </td>
+            <td id='wbt1'> </td>
+            <td id='ext1'> </td>
+        </tr>
+        <tr>
+            <td id='inst2'> </td>
+            <td id='ist2'> </td>
+            <td id='wbt2'> </td>
+            <td id='ext2'> </td>
+        </tr>
+        <tr>
+            <td id='inst3'> </td>
+            <td id='ist3'> </td>
+            <td id='wbt3'> </td>
+            <td id='ext3'> </td>
+        </tr>
+        <tr>
+            <td id='inst4'> </td>
+            <td id='ist4'> </td>
+            <td id='wbt4'> </td>
+            <td id='ext4'> </td>
+        </tr>
+    </table>
+</div>
 
 </html>
