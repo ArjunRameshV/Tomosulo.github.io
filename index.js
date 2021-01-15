@@ -18,7 +18,7 @@ $(document).ready(function() {
     const bin_mod_number = 5
     const load_mod_number = 3
     const freg_number = 6
-    const fps = 5;
+    const fps = 10;
     const add_t = 3;
     const mult_t = 10;
     const load_t = 2;
@@ -28,7 +28,9 @@ $(document).ready(function() {
     var c = document.getElementById("canvas");
     var ctx = c.getContext("2d");
     ctx.beginPath();
-
+    ctx.fillStyle = '#C7C7C7';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+      
     function int16(v) {
         return (v << 16) >> 16;
     }
@@ -1193,3 +1195,4 @@ $(document).ready(function() {
     }
 
 });
+
